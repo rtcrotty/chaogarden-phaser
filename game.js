@@ -1,7 +1,7 @@
 var game = new Phaser.Game(240, 160, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
 function preload () {
-	game.load.baseURL = 'chaogarden-phaser/assets/';
+	game.load.baseURL = 'assets/';
 
 	// Preload background area
 	game.load.image('garden');
