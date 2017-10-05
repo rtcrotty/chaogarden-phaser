@@ -21,7 +21,7 @@ var objGroup;
 var actions = ['idle','left','right','up','down','sit','think'];
 var ballflip = {right: true, up: true};
 var ballanim = {think: 'question'};
-var timer, keys;
+var timer;
 
 var splash;
 function create () {
@@ -33,12 +33,15 @@ function create () {
 	game.renderer.renderSession.roundPixels = true;
 	Phaser.Canvas.setImageRenderingCrisp(game.canvas);
 
-	// ready the game timer to handle events
-	timer = game.time.create(false);
+	// draw splash screen
+	splash = game.add.sprite(0, 0, 'splash');
+	splash.animations.add('flash', [0,1], 2, true);
+	splash.animations.play('flash');
 
-	// init key listener
-	keys = game.input.keyboard.createCursorKeys();
+	game.input.maxPointers = 1;
+}
 
+function setUp() {
 	// start the physics
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -46,7 +49,10 @@ function create () {
 	game.add.image(176, 0, 'statbar');
 	var garden = game.add.image(0, 0, 'garden');
 	garden.anchor.setTo(0, 0);
-	game.physics.arcade.setBounds(0, 0, garden.right, garden.bottom);
+	game.physics.arcade.setBounds(0, 20, garden.right, garden.bottom-20);
+
+	// ready the game timer to handle events
+	timer = game.time.create(false);
 
 	// spawn chao
 	objGroup = game.add.group();
@@ -57,6 +63,8 @@ function create () {
 
 	//start the game timer
 	timer.start();
+
+	splash.kill();
 }
 
 function spawnChao(x,y) {
@@ -95,10 +103,16 @@ function spawnChao(x,y) {
 }
 
 function update() {
+	var cursor = game.input.activePointer;
+	if(splash.alive) {
+		if(cursor.isDown) { setUp(); }
+		return;
+	}
+
 	game.physics.arcade.collide(objGroup, objGroup);
 
 	objGroup.forEach(move,null,true);
-	objGroup.sort('y', Phaser.Group.SORT_ASCENDING)
+	objGroup.sort('y', Phaser.Group.SORT_ASCENDING);
 }
 
 function move(chao) {
