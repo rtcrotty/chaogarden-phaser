@@ -3,12 +3,18 @@ var game = new Phaser.Game(240, 160, Phaser.AUTO, '', { preload: preload, create
 function preload () {
 	game.load.baseURL = 'assets/';
 
-	// Preload background area
+	// Preload splash and area
+	game.load.spritesheet('splash','splash.png',240,160);
 	game.load.image('garden');
+	game.load.image('statbar');
 
 	// Preload all chao animations
-	game.load.spritesheet('chao','chao/chao.png',25,25);
-	game.load.spritesheet('emball','chao/emoteball.png',8,15)
+	game.load.spritesheet('chao','chao.png',25,25);
+	game.load.spritesheet('emball','emoteball.png',8,15);
+
+	// Preload other assets
+	game.load.spritesheet('ring','ring.png',14,14);
+	game.load.spritesheet('numbers','numbers.png',7,7);
 }
 
 var objGroup;
@@ -17,28 +23,30 @@ var ballflip = {right: true, up: true};
 var ballanim = {think: 'question'};
 var timer, keys;
 
+var splash;
 function create () {
 	// scale the game 4x
 	game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;  
 	game.scale.setUserScale(4, 4);
 
 	// enable crisp rendering
-	game.renderer.renderSession.roundPixels = true;  
-	Phaser.Canvas.setImageRenderingCrisp(this.game.canvas)  
-
-	// start the physics
-	game.physics.startSystem(Phaser.Physics.ARCADE);
+	game.renderer.renderSession.roundPixels = true;
+	Phaser.Canvas.setImageRenderingCrisp(game.canvas);
 
 	// ready the game timer to handle events
 	timer = game.time.create(false);
 
-	// build the garden
-	var garden = game.add.image(0,0, 'garden');
-	garden.anchor.setTo(0,0);
-	game.world.setBounds(0,0,garden.right,garden.bottom);
+	// init key listener
+	keys = game.input.keyboard.createCursorKeys();
 
-	// sprites' anchor is at bottom center
-	PIXI.Sprite.defaultAnchor = {"x":0.5,"y":1};
+	// start the physics
+	game.physics.startSystem(Phaser.Physics.ARCADE);
+
+	// build the garden
+	game.add.image(176, 0, 'statbar');
+	var garden = game.add.image(0, 0, 'garden');
+	garden.anchor.setTo(0, 0);
+	game.physics.arcade.setBounds(0, 0, garden.right, garden.bottom);
 
 	// spawn chao
 	objGroup = game.add.group();
@@ -46,9 +54,6 @@ function create () {
 	spawnChao(game.world.width / 2, game.world.height / 2)
 	spawnChao(game.world.width / 3, game.world.height / 2)
 	spawnChao(game.world.width*2 / 3, game.world.height / 2)
-
-	// init key listener
-	keys = game.input.keyboard.createCursorKeys();
 
 	//start the game timer
 	timer.start();
@@ -58,6 +63,8 @@ function spawnChao(x,y) {
 	var chao = game.add.sprite(x, y, 'chao');
 	objGroup.add(chao);
 	
+	chao.anchor.setTo(0.5, 1);
+
 	chao.animations.add('idle',[0]);
 	chao.animations.add('sit',[1]);
 	chao.animations.add('think',[2]);
@@ -73,6 +80,8 @@ function spawnChao(x,y) {
 
 	var emball = game.add.sprite(5, -25, 'emball');
 	chao.addChild(emball);
+
+	emball.anchor.setTo(0.5, 1);
 
 	emball.animations.add('normal',[0]);
 	emball.animations.add('excite',[1]);
