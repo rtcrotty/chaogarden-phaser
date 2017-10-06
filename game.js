@@ -39,6 +39,7 @@ function create () {
 	splash.animations.play('flash');
 
 	game.input.maxPointers = 1;
+	game.stage.disableVisibilityChange = true;
 }
 
 function setUp() {
@@ -57,9 +58,14 @@ function setUp() {
 	// spawn chao
 	objGroup = game.add.group();
 
-	spawnChao(game.world.width / 2, game.world.height / 2)
+	chaoSpawner = game.add.sprite()
+	chaoSpawner.inputEnabled = true;
+	chaoSpawner.hitArea = game.physics.arcade.bounds;
+	chaoSpawner.events.onInputDown.add(function(area,pointer) {
+		spawnChao(pointer.positionDown.x,pointer.positionDown.y);
+	});
+
 	spawnChao(game.world.width / 3, game.world.height / 2)
-	spawnChao(game.world.width*2 / 3, game.world.height / 2)
 
 	//start the game timer
 	timer.start();
